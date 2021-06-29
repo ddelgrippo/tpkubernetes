@@ -1,0 +1,80 @@
+---
+# Se crea el servicio de LoadBalancer para la app Drupal con el puerto 80.
+apiVersion: v1
+kind: Service
+metadata:
+  name: drupal-service 
+  labels:
+    app: drupal
+spec:
+  ports:
+    - port: 80
+      name: http
+      protocol: TCP
+  selector:
+    app: drupal
+    tier: frontend
+  type: LoadBalancer
+---
+#Se crea el deployment de Drupal, con 3 replicas y la estrategia de RollingUpdate para poder hacer update o RollBack. 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drupal
+  labels:
+    app: drupal
+    tier: frontend
+spec:
+  selector:
+    matchLabels:
+      app: drupal
+      tier: frontend
+  strategy:
+    type: RollingUpdate
+  replicas: 3	
+  template:
+    metadata:
+      labels:
+        app: drupal
+        tier: frontend
+    spec:
+      initContainers:
+        - name: init-sites-volume
+          image: drupal:8.6
+          command: ['/bin/bash', '-c']
+          args: ['cp -r /var/www/html/sites /data; chown www-data:www-data /data/ -R']
+          volumeMounts:
+          - mountPath: /data
+            name: drupal-pvc
+      containers:
+      - image: drupal:8.6 #Se selecciono esta version para poder probar el update a la ultima version.
+        imagePullPolicy: IfNotPresent
+        name: drupal
+        env:
+        - name: DRUPAL_DATABASE_HOST
+          value: drupal-mysql
+        - name: DRUPAL_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass-2f466cdddc
+              key: password
+        ports:
+        - containerPort: 80
+          name: drupal
+        volumeMounts:
+        - name: drupal-pvc
+          mountPath: /var/www/html/modules
+          subPath: modules
+        - name: drupal-pvc
+          mountPath: /var/www/html/profiles
+          subPath: profiles
+        - name: drupal-pvc
+          mountPath: /var/www/html/sites
+          subPath: sites
+        - name: drupal-pvc
+          mountPath: /var/www/html/themes
+          subPath: themes
+      volumes:
+        - name: drupal-pvc
+          persistentVolumeClaim:
+            claimName: drupal-pv

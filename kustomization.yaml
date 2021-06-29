@@ -1,0 +1,5 @@
+#Se crea la password cifrada para los accesos a la base y al usuario root en las apps.
+secretGenerator:
+        - name: mysql-pass
+          literals:
+          - password=123456

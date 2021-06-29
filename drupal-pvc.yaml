@@ -1,0 +1,12 @@
+#Se crea el volumen claim asociado al volumen local de la app Drupal. 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: drupal-pv 
+spec:
+ storageClassName: manual
+ accessModes:
+   - ReadWriteOnce
+ resources:
+   requests:
+     storage: 5Gi

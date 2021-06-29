@@ -1,0 +1,16 @@
+#Se crea el volumen local para la app de Drupal con un tamaño de 5G.
+#Se podria tambien generar volumenes dinamicos, pero me falto probarlo.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: drupal-pv
+  labels:
+    type: local
+spec:
+ storageClassName: manual
+ capacity:
+   storage: 5Gi
+ accessModes:
+   - ReadWriteOnce
+ hostPath:
+   path: "/opt/storage/drupal"
