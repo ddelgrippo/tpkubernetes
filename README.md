@@ -1,5 +1,5 @@
 # tpkubernetes
-# En el archivo .doc adjunto esta el paso a paso con imagenes y referencias mas concretas.
+# En el archivo "TP Kubernetes.doc" adjunto esta el paso a paso con imagenes y referencias mas concretas.
 
 # Creacion del nuevo directorio
   $ mkdir drupal
